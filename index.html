@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <title>Mis Restaurantes</title>
-  <meta name="theme-color" content="#ff4d6d"/>
+  <meta name="theme-color" content="#0b0e14"/>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="stylesheet" href="styles.css">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
@@ -13,7 +13,7 @@
   <header class="app-header">
     <h1>🍽️ Mis Restaurantes</h1>
     <div class="actions">
-      <button id="themeToggle" class="btn secondary" title="Tema oscuro">🌙</button>
+      <button id="themeToggle" class="btn secondary" title="Tema claro/oscuro">🌙</button>
       <button id="exportBtn" class="btn secondary">Exportar</button>
       <label class="btn secondary filelabel">
         Importar
@@ -31,74 +31,227 @@
   </nav>
 
   <main>
-    <section id="tab-add" class="tabpanel active">
-      <div class="card"><h2>Nueva visita</h2><form id="visitForm"><div class="grid">
-        <label><span>Restaurante</span><input type="text" id="restaurant" required list="restaurantList"></label>
-        <label><span>Ciudad</span><input type="text" id="city"></label>
-        <label><span>Fecha</span><input type="date" id="date" required></label>
-        <label><span>N.º de comensales</span><input type="number" id="diners" min="1" step="1" required></label>
-        <label><span>Importe total (€)</span><input type="number" id="total" min="0" step="0.01" required></label>
-        <label><span>Precio medio / comensal</span><input type="text" id="avgPerDiner" readonly></label>
-        <div class="maps-field"><span>Google Maps</span><div class="maps-actions">
-          <input type="url" id="mapsUrl" placeholder="Pega aquí el enlace (opcional)">
-          <button type="button" id="mapsSearch" class="btn outline">Buscar</button>
-        </div></div>
-        <div class="rating-field"><span>Valoración (0–5)</span>
-          <div id="rating" class="stars"><button type="button" data-value="1">★</button><button type="button" data-value="2">★</button><button type="button" data-value="3">★</button><button type="button" data-value="4">★</button><button type="button" data-value="5">★</button><button type="button" id="ratingClear" class="clear">0</button></div>
-          <input type="hidden" id="ratingValue" value="0">
-        </div>
-        <label class="full"><span>Observaciones</span><textarea id="notes" rows="3"></textarea></label>
-        <datalist id="restaurantList"></datalist>
-      </div><div class="form-actions"><button type="button" id="cancelEdit" class="btn secondary" style="display:none">Cancelar edición</button><button type="submit" id="submitBtn" class="btn primary">Guardar visita</button></div></form></div>
-      <div class="card"><h3>Últimas visitas</h3><ul id="recentList" class="list"></ul></div>
+    <!-- Añadir visita -->
+    <section id="tab-add" class="tabpanel active" role="tabpanel">
+      <div class="card">
+        <h2>Nueva visita</h2>
+        <form id="visitForm">
+          <div class="grid">
+            <label>
+              <span>Restaurante</span>
+              <input type="text" id="restaurant" placeholder="Nombre del restaurante" required list="restaurantList" autocomplete="organization">
+            </label>
+
+            <label>
+              <span>Ciudad</span>
+              <input type="text" id="city" placeholder="Ej: Madrid" autocomplete="address-level2">
+            </label>
+
+            <label>
+              <span>Fecha</span>
+              <input type="date" id="date" required>
+            </label>
+
+            <label>
+              <span>N.º de comensales</span>
+              <input type="number" id="diners" min="1" step="1" inputmode="numeric" required>
+            </label>
+
+            <label>
+              <span>Importe total (€)</span>
+              <input type="number" id="total" min="0" step="0.01" inputmode="decimal" required>
+            </label>
+
+            <label>
+              <span>Precio medio / comensal</span>
+              <input type="text" id="avgPerDiner" readonly>
+            </label>
+
+            <div class="maps-field">
+              <span>Google Maps</span>
+              <div class="maps-actions">
+                <input type="url" id="mapsUrl" placeholder="Pega aquí el enlace (opcional)">
+                <button type="button" id="mapsSearch" class="btn outline">Buscar</button>
+              </div>
+            </div>
+
+            <div class="rating-field">
+              <span>Valoración (0–5)</span>
+              <div id="rating" class="stars" aria-label="Valoración por estrellas">
+                <button type="button" data-value="1" aria-label="1 estrella">★</button>
+                <button type="button" data-value="2" aria-label="2 estrellas">★</button>
+                <button type="button" data-value="3" aria-label="3 estrellas">★</button>
+                <button type="button" data-value="4" aria-label="4 estrellas">★</button>
+                <button type="button" data-value="5" aria-label="5 estrellas">★</button>
+                <button type="button" id="ratingClear" class="clear">0</button>
+              </div>
+              <input type="hidden" id="ratingValue" value="0">
+            </div>
+
+            <label class="full">
+              <span>Observaciones</span>
+              <textarea id="notes" rows="3" placeholder="Comida, servicio, platos destacados..."></textarea>
+            </label>
+
+            <datalist id="restaurantList"></datalist>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" id="cancelEdit" class="btn secondary" style="display:none">Cancelar edición</button>
+            <button type="submit" id="submitBtn" class="btn primary">Guardar visita</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="card">
+        <h3>Últimas visitas</h3>
+        <ul id="recentList" class="list"></ul>
+      </div>
     </section>
 
-    <section id="tab-summary" class="tabpanel"><div class="card"><h2>Resumen por restaurante y año</h2><div class="table-wrap"><table id="summaryTable"><thead><tr><th>Restaurante</th><th>Año</th><th>Visitas</th><th>Precio medio / comensal</th><th>Valoración media</th></tr></thead><tbody></tbody></table></div></div></section>
+    <!-- Resumen -->
+    <section id="tab-summary" class="tabpanel" role="tabpanel">
+      <div class="card">
+        <h2>Resumen por restaurante y año</h2>
+        <div class="table-wrap">
+          <table id="summaryTable">
+            <thead>
+              <tr>
+                <th>Restaurante</th>
+                <th>Año</th>
+                <th>Visitas</th>
+                <th>Precio medio / comensal</th>
+                <th>Valoración media</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
 
-    <section id="tab-history" class="tabpanel"><div class="card"><h2>Historial por restaurante</h2><div class="filters"><label><span>Selecciona restaurante</span><select id="restaurantFilter"><option value="">— Elige uno —</option></select></label></div><div id="historyContainer"></div></div></section>
+    <!-- Historial -->
+    <section id="tab-history" class="tabpanel" role="tabpanel">
+      <div class="card">
+        <h2>Historial por restaurante</h2>
+        <div class="filters">
+          <label>
+            <span>Selecciona restaurante</span>
+            <select id="restaurantFilter">
+              <option value="">— Elige uno —</option>
+            </select>
+          </label>
+        </div>
+        <div id="historyContainer"></div>
+      </div>
+    </section>
 
-    <section id="tab-explore" class="tabpanel"><div class="card"><h2>Explorar por ciudades y valoración</h2><div class="filters"><label><span>Ciudad</span><select id="cityFilter"><option value="">Todas</option></select></label><label><span>Valoración mínima</span><select id="minRating"><option value="0">0+</option><option value="1">1+</option><option value="2">2+</option><option value="3">3+</option><option value="4">4+</option><option value="5">5</option></select></label><label><span>Ordenar</span><select id="sortBy"><option value="ratingDesc">Mejor valoración → peor</option><option value="ratingAsc">Peor valoración → mejor</option><option value="avgPPAsc">Precio medio ↑</option><option value="avgPPDesc">Precio medio ↓</option><option value="visitsDesc">Más visitas</option></select></label></div></div><div class="card"><div id="exploreInfo" class="muted"></div><div id="exploreContainer"></div></div></section>
+    <!-- Explorar -->
+    <section id="tab-explore" class="tabpanel" role="tabpanel">
+      <div class="card">
+        <h2>Explorar por ciudades y valoración</h2>
+        <div class="filters">
+          <label>
+            <span>Ciudad</span>
+            <select id="cityFilter">
+              <option value="">Todas</option>
+            </select>
+          </label>
+          <label>
+            <span>Valoración mínima</span>
+            <select id="minRating">
+              <option value="0">0+</option>
+              <option value="1">1+</option>
+              <option value="2">2+</option>
+              <option value="3">3+</option>
+              <option value="4">4+</option>
+              <option value="5">5</option>
+            </select>
+          </label>
+          <label>
+            <span>Ordenar</span>
+            <select id="sortBy">
+              <option value="ratingDesc">Mejor valoración → peor</option>
+              <option value="ratingAsc">Peor valoración → mejor</option>
+              <option value="avgPPAsc">Precio medio ↑</option>
+              <option value="avgPPDesc">Precio medio ↓</option>
+              <option value="visitsDesc">Más visitas</option>
+            </select>
+          </label>
+        </div>
+      </div>
 
-    <section id="tab-friends" class="tabpanel">
+      <div class="card">
+        <div id="exploreInfo" class="muted"></div>
+        <div id="exploreContainer"></div>
+      </div>
+    </section>
+
+    <!-- Amigos -->
+    <section id="tab-friends" class="tabpanel" role="tabpanel">
       <div class="card">
         <h2>Cuenta</h2>
         <div class="grid">
-          <label><span>Email</span><input type="email" id="authEmail" placeholder="tu@correo.com"></label>
-          <div style="display:flex; gap:8px; align-items:end;">
+          <label>
+            <span>Email</span>
+            <input type="email" id="authEmail" placeholder="tu@correo.com">
+          </label>
+          <div style="display:flex; align-items:end; gap:8px; flex-wrap:wrap;">
             <button id="sendMagicLink" class="btn primary">Iniciar sesión (enlace mágico)</button>
             <button id="checkSessionBtn" class="btn secondary">Comprobar sesión</button>
             <button id="signOutBtn" class="btn outline">Cerrar sesión</button>
           </div>
-          <label class="full"><span>Nombre de usuario</span><input type="text" id="usernameInput" placeholder="ej: casapaco_85"></label>
-          <div style="display:flex; gap:8px; align-items:end;"><button id="saveUsernameBtn" class="btn secondary">Guardar nombre de usuario</button></div>
+          <label class="full">
+            <span>Nombre de usuario</span>
+            <input type="text" id="usernameInput" placeholder="ej: casapaco_85">
+          </label>
+          <div style="display:flex; align-items:end; gap:8px;">
+            <button id="saveUsernameBtn" class="btn secondary">Guardar nombre de usuario</button>
+          </div>
         </div>
+
         <details style="margin-top:8px;">
           <summary class="advanced-summary">Configuración avanzada (opcional)</summary>
           <div class="grid" style="margin-top:8px;">
-            <label><span>SUPABASE_URL</span><input type="url" id="supabaseUrlInput" placeholder="https://xxxxx.supabase.co"></label>
-            <label><span>SUPABASE_ANON_KEY</span><input type="text" id="supabaseAnonInput" placeholder="clave pública"></label>
-            <div style="display:flex; gap:8px; align-items:end;">
+            <label>
+              <span>SUPABASE_URL</span>
+              <input type="url" id="supabaseUrlInput" placeholder="https://xxxxx.supabase.co">
+            </label>
+            <label>
+              <span>SUPABASE_ANON_KEY</span>
+              <input type="text" id="supabaseAnonInput" placeholder="clave pública">
+            </label>
+            <div style="display:flex; align-items:end; gap:8px;">
               <button id="saveSupabaseCfgBtn" class="btn secondary">Guardar configuración</button>
               <button id="clearSupabaseCfgBtn" class="btn danger outline">Borrar configuración</button>
             </div>
           </div>
-          <p class="muted">Se guardan solo en este dispositivo.</p>
+          <p class="muted">Se guardan solo en este dispositivo. Normalmente no necesitas tocar esto.</p>
         </details>
+
         <div id="accountInfo" class="muted" style="margin-top:8px;"></div>
-        <div id="autoSyncNote" class="muted" style="margin-top:6px;">La app sincroniza automáticamente tu resumen…</div>
+        <div id="autoSyncNote" class="muted" style="margin-top:6px;">
+          La app sincroniza <strong>automáticamente</strong> tu resumen cuando añades o editas visitas.
+        </div>
       </div>
-      <div class="card"><h2>Amigos</h2><div class="grid">
-        <label><span>Buscar usuario</span><input type="text" id="friendUsernameInput"></label>
-        <div style="display:flex; gap:8px; align-items:end;"><button id="sendFriendRequestBtn" class="btn primary">Enviar solicitud</button></div>
-      </div><div class="group"><h4>Solicitudes recibidas</h4><div id="incomingRequests"></div></div><div class="group"><h4>Solicitudes enviadas</h4><div id="outgoingRequests"></div></div><div class="group"><h4>Amigos conectados</h4><div id="friendsList"></div></div></div>
-      <div class="card"><h2>Resumen de amigo</h2><div class="filters"><label><span>Selecciona amigo</span><select id="friendSelectUsers"><option value="">— Elige uno —</option></select></label><label><span>Ciudad</span><select id="friendCityFilterUsers"><option value="">Todas</option></select></label><label><span>Valoración mínima</span><select id="friendMinRatingUsers"><option value="0">0+</option><option value="1">1+</option><option value="2">2+</option><option value="3">3+</option><option value="4">4+</option><option value="5">5</option></select></label><label><span>Ordenar</span><select id="friendSortByUsers"><option value="ratingDesc">Mejor valoración → peor</option><option value="ratingAsc">Peor valoración → mejor</option><option value="avgPPAsc">Precio medio ↑</option><option value="avgPPDesc">Precio medio ↓</option><option value="visitsDesc">Más visitas</option></select></label></div><div id="friendSummaryUsers"></div></div>
     </section>
   </main>
 
-  <footer class="app-footer"><button id="clearAll" class="btn danger outline">Borrar todo</button><span class="muted">Datos locales; con amigos solo el resumen agregado.</span></footer>
+  <footer class="app-footer">
+    <button id="clearAll" class="btn danger outline">Borrar todo</button>
+    <span class="muted">Datos locales; con amigos solo se comparte el resumen agregado.</span>
+  </footer>
 
   <script src="config.js"></script>
   <script src="script.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    // Service worker (PWA)
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('service-worker.js').catch(()=>{});
+      });
+    }
+  </script>
 </body>
 </html>

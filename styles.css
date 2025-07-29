@@ -1,4 +1,3 @@
-
 :root{
   --bg:#f7f7fb;
   --text:#111827;
@@ -11,7 +10,6 @@
   --danger:#ef4444;
   --shadow:0 10px 25px rgba(0,0,0,.08);
 }
-/* Dark theme overrides */
 html[data-theme="dark"]{
   --bg:#0b0e14;
   --text:#e5e7eb;
@@ -24,13 +22,11 @@ html[data-theme="dark"]{
   --danger:#f87171;
   --shadow:0 10px 25px rgba(0,0,0,.4);
 }
-
-/* Base UI (kept concise) */
 *{box-sizing:border-box}
 html,body{height:100%}
 body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,Arial;background:var(--bg);color:var(--text)}
 .app-header{background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;padding:16px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10;box-shadow:var(--shadow)}
-.app-header h1{margin:0;font-size:1.1rem}
+.app-header h1{margin:0;font-size:1.2rem}
 .actions{display:flex;gap:8px;flex-wrap:wrap}
 .tabs{display:flex;gap:6px;padding:10px;position:sticky;top:64px;background:rgba(0,0,0,.03);backdrop-filter:blur(6px);z-index:9}
 .tab{flex:1;padding:10px 12px;border:1px solid var(--border);background:var(--card);border-radius:999px;font-weight:600}
@@ -45,7 +41,8 @@ label.full{grid-column:1 / -1}
 .maps-actions{display:flex;gap:8px;align-items:center}
 .maps-actions input{flex:1}
 .stars{display:flex;gap:6px;align-items:center}
-.stars button{font-size:1.4rem;line-height:1;background:transparent;border:none;padding:6px;color:#ffd166}
+.stars button{font-size:1.4rem;line-height:1;background:transparent;border:none;padding:6px;color:#9ca3af;cursor:pointer}
+.stars button.filled{color:#ffb703}
 .stars .clear{border:1px solid var(--border);border-radius:10px;padding:6px 10px;font-size:.9rem;color:inherit;background:transparent}
 .form-actions{margin-top:10px;display:flex;gap:8px;justify-content:flex-end}
 .btn{border:none;border-radius:999px;padding:10px 16px;font-weight:700;cursor:pointer}
@@ -68,8 +65,7 @@ html[data-theme="dark"] .badge{background:#1f2937;color:#e5e7eb}
 .app-footer{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:14px;color:var(--muted)}
 .muted{color:var(--muted)}
 #visitForm.editing{outline:2px dashed var(--accent);outline-offset:6px}
-@media (max-width:720px){.grid{grid-template-columns:1fr}.tabs{top:60px}}
-
-/* Advanced config: keep it subtle */
+/* Advanced config subtle */
 .advanced-summary{font-size:.9rem;color:var(--muted);cursor:pointer;user-select:none}
 details[open]>.advanced-summary{color:var(--text)}
+@media (max-width:720px){.grid{grid-template-columns:1fr}.tabs{top:60px}}
