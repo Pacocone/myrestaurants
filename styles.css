@@ -69,3 +69,7 @@ html[data-theme="dark"] .badge{background:#1f2937;color:#e5e7eb}
 .muted{color:var(--muted)}
 #visitForm.editing{outline:2px dashed var(--accent);outline-offset:6px}
 @media (max-width:720px){.grid{grid-template-columns:1fr}.tabs{top:60px}}
+
+/* Advanced config: keep it subtle */
+.advanced-summary{font-size:.9rem;color:var(--muted);cursor:pointer;user-select:none}
+details[open]>.advanced-summary{color:var(--text)}
