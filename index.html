@@ -1,13 +1,13 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
   <title>Mis Restaurantes</title>
-  <meta name="theme-color" content="#0b0e14"/>
-  <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="styles.css">
-  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <meta name="theme-color" content="#0b0e14" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
 </head>
 <body>
   <header class="app-header">
@@ -17,7 +17,7 @@
       <button id="exportBtn" class="btn secondary">Exportar</button>
       <label class="btn secondary filelabel">
         Importar
-        <input type="file" id="importInput" accept="application/json" hidden>
+        <input type="file" id="importInput" accept="application/json" hidden />
       </label>
     </div>
   </header>
@@ -39,42 +39,35 @@
           <div class="grid">
             <label>
               <span>Restaurante</span>
-              <input type="text" id="restaurant" placeholder="Nombre del restaurante" required list="restaurantList" autocomplete="organization">
+              <input type="text" id="restaurant" placeholder="Nombre del restaurante" required list="restaurantList" autocomplete="organization" />
             </label>
-
             <label>
               <span>Ciudad</span>
-              <input type="text" id="city" placeholder="Ej: Madrid" autocomplete="address-level2">
+              <input type="text" id="city" placeholder="Ej: Madrid" autocomplete="address-level2" />
             </label>
-
             <label>
               <span>Fecha</span>
-              <input type="date" id="date" required>
+              <input type="date" id="date" required />
             </label>
-
             <label>
               <span>N.º de comensales</span>
-              <input type="number" id="diners" min="1" step="1" inputmode="numeric" required>
+              <input type="number" id="diners" min="1" step="1" inputmode="numeric" required />
             </label>
-
             <label>
               <span>Importe total (€)</span>
-              <input type="number" id="total" min="0" step="0.01" inputmode="decimal" required>
+              <input type="number" id="total" min="0" step="0.01" inputmode="decimal" required />
             </label>
-
             <label>
               <span>Precio medio / comensal</span>
-              <input type="text" id="avgPerDiner" readonly>
+              <input type="text" id="avgPerDiner" readonly />
             </label>
-
             <div class="maps-field">
               <span>Google Maps</span>
               <div class="maps-actions">
-                <input type="url" id="mapsUrl" placeholder="Pega aquí el enlace (opcional)">
+                <input type="url" id="mapsUrl" placeholder="Pega aquí el enlace (opcional)" />
                 <button type="button" id="mapsSearch" class="btn outline">Buscar</button>
               </div>
             </div>
-
             <div class="rating-field">
               <span>Valoración (0–5)</span>
               <div id="rating" class="stars" aria-label="Valoración por estrellas">
@@ -85,17 +78,14 @@
                 <button type="button" data-value="5" aria-label="5 estrellas">★</button>
                 <button type="button" id="ratingClear" class="clear">0</button>
               </div>
-              <input type="hidden" id="ratingValue" value="0">
+              <input type="hidden" id="ratingValue" value="0" />
             </div>
-
             <label class="full">
               <span>Observaciones</span>
               <textarea id="notes" rows="3" placeholder="Comida, servicio, platos destacados..."></textarea>
             </label>
-
             <datalist id="restaurantList"></datalist>
           </div>
-
           <div class="form-actions">
             <button type="button" id="cancelEdit" class="btn secondary" style="display:none">Cancelar edición</button>
             <button type="submit" id="submitBtn" class="btn primary">Guardar visita</button>
@@ -180,7 +170,6 @@
           </label>
         </div>
       </div>
-
       <div class="card">
         <div id="exploreInfo" class="muted"></div>
         <div id="exploreContainer"></div>
@@ -194,7 +183,7 @@
         <div class="grid">
           <label>
             <span>Email</span>
-            <input type="email" id="authEmail" placeholder="tu@correo.com">
+            <input type="email" id="authEmail" placeholder="tu@correo.com" />
           </label>
           <div style="display:flex; align-items:end; gap:8px; flex-wrap:wrap;">
             <button id="sendMagicLink" class="btn primary">Iniciar sesión (enlace mágico)</button>
@@ -203,7 +192,7 @@
           </div>
           <label class="full">
             <span>Nombre de usuario</span>
-            <input type="text" id="usernameInput" placeholder="ej: casapaco_85">
+            <input type="text" id="usernameInput" placeholder="ej: casapaco_85" />
           </label>
           <div style="display:flex; align-items:end; gap:8px;">
             <button id="saveUsernameBtn" class="btn secondary">Guardar nombre de usuario</button>
@@ -215,11 +204,11 @@
           <div class="grid" style="margin-top:8px;">
             <label>
               <span>SUPABASE_URL</span>
-              <input type="url" id="supabaseUrlInput" placeholder="https://xxxxx.supabase.co">
+              <input type="url" id="supabaseUrlInput" placeholder="https://xxxxx.supabase.co" />
             </label>
             <label>
               <span>SUPABASE_ANON_KEY</span>
-              <input type="text" id="supabaseAnonInput" placeholder="clave pública">
+              <input type="text" id="supabaseAnonInput" placeholder="clave pública" />
             </label>
             <div style="display:flex; align-items:end; gap:8px;">
               <button id="saveSupabaseCfgBtn" class="btn secondary">Guardar configuración</button>
@@ -242,9 +231,10 @@
     <span class="muted">Datos locales; con amigos solo se comparte el resumen agregado.</span>
   </footer>
 
+  <!-- Carga ordenada: supabase primero, luego config y script -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
   <script src="script.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     // Service worker (PWA)
     if ('serviceWorker' in navigator) {

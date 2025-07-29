@@ -1,22 +1,22 @@
-// ====== Utilidades base ======
+// ====== Utilidades ======
 const DB_KEY = 'visitas_restaurantes_v1';
 const fmtEUR = new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' });
-const fmt2 = n => (Math.round(n*100)/100).toFixed(2);
-const $ = s => document.querySelector(s);
-const $$ = s => document.querySelectorAll(s);
-const byId = id => document.getElementById(id);
-const todayISO = () => new Date().toISOString().slice(0,10);
-const yearOf = iso => new Date(iso + 'T12:00:00').getFullYear();
+const fmt2 = (n) => (Math.round(n * 100) / 100).toFixed(2);
+const $ = (s) => document.querySelector(s);
+const $$ = (s) => document.querySelectorAll(s);
+const byId = (id) => document.getElementById(id);
+const todayISO = () => new Date().toISOString().slice(0, 10);
+const yearOf = (iso) => new Date(iso + 'T12:00:00').getFullYear();
 function norm(s){ return (s || '').toString().trim().replace(/\s+/g,' ').toLocaleLowerCase('es-ES'); }
 function avg(arr){ return arr.length ? arr.reduce((a,b)=>a+b,0) / arr.length : 0; }
 function uid(){ return Math.random().toString(36).slice(2) + Date.now().toString(36); }
-function escapeHTML(str) {
+function escapeHTML(str){
   return (str ?? '').toString().replace(/[&<>"']/g, (s) =>
     ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[s])
   );
 }
 
-// ====== Tema claro/oscuro ======
+// ====== Tema ======
 function updateMetaThemeColor(){
   const meta = document.querySelector('meta[name="theme-color"]');
   const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
@@ -74,13 +74,11 @@ function initTabs(){
   });
 }
 
-// ====== Formulario Añadir ======
+// ====== Formulario Añadir/Editar ======
 let editingId = null;
 function initForm(){
-  // fecha por defecto
   byId('date').value = todayISO();
 
-  // cálculo precio medio
   function updateAvg(){
     const diners = parseInt(byId('diners').value || '0', 10);
     const total = parseFloat(byId('total').value || '0');
@@ -89,7 +87,6 @@ function initForm(){
   byId('diners').addEventListener('input', updateAvg);
   byId('total').addEventListener('input', updateAvg);
 
-  // Google Maps
   byId('mapsSearch').addEventListener('click', () => {
     const name = byId('restaurant').value.trim();
     if(!name){ alert('Introduce el nombre del restaurante para buscarlo en Google Maps.'); return; }
@@ -97,7 +94,6 @@ function initForm(){
     window.open(`https://www.google.com/maps/search/?api=1&query=${q}`, '_blank');
   });
 
-  // Estrellas
   const starsEl = byId('rating');
   const hidden = byId('ratingValue');
   function paintStars(v){
@@ -109,7 +105,6 @@ function initForm(){
   }));
   byId('ratingClear').addEventListener('click', () => { hidden.value = '0'; paintStars(0); });
 
-  // Guardar visita
   byId('visitForm').addEventListener('submit', (e) => {
     e.preventDefault();
     const restaurant = byId('restaurant').value.trim();
@@ -148,10 +143,8 @@ function startEdit(id){
   byId('mapsUrl').value = v.mapsUrl || '';
   byId('notes').value = v.notes || '';
   byId('ratingValue').value = String(v.rating || 0);
-  // pintar estrellas
   const starsEl = byId('rating');
   starsEl.querySelectorAll('button[data-value]').forEach(b => { const val = parseInt(b.dataset.value,10); b.classList.toggle('filled', val <= (v.rating||0)); });
-  // actualizar PM
   const diners = parseInt(byId('diners').value || '0', 10); const total = parseFloat(byId('total').value || '0');
   byId('avgPerDiner').value = diners > 0 ? fmt2(total/diners) + ' €' : '—';
   editingId = id;
@@ -298,7 +291,7 @@ function renderHistory(){
   }
 }
 
-// City filter + Explore
+// Explorar
 function getActiveVisits(){ return state.visits; }
 function computeAggregatedByRestaurantCity(visits){
   const map = new Map();
@@ -358,12 +351,8 @@ function renderExplore(){
   }
   container.innerHTML=''; container.appendChild(table);
 }
-function initExplore(){
-  ['cityFilter','minRating','sortBy'].forEach(id => byId(id).addEventListener('change', renderExplore));
-  renderExplore();
-}
+function initExplore(){ ['cityFilter','minRating','sortBy'].forEach(id => byId(id).addEventListener('change', renderExplore)); renderExplore(); }
 
-// Datalist de restaurantes
 function renderRestaurantDatalist(){
   const dl = byId('restaurantList'); if(!dl) return;
   const map = new Map(); state.visits.forEach(v => { const k = norm(v.restaurant); if(!map.has(k)) map.set(k, v.restaurant); });
@@ -371,14 +360,12 @@ function renderRestaurantDatalist(){
   dl.innerHTML = names.map(n => `<option value="${escapeHTML(n)}"></option>`).join('');
 }
 
-// Eliminar visita
 function deleteVisit(id){
   const idx = state.visits.findIndex(v => v.id === id);
   if(idx === -1) return;
   if(confirm('¿Seguro que quieres eliminar esta visita?')){ state.visits.splice(idx,1); save(); renderAll(); }
 }
 
-// Render general
 function renderAll(){
   renderRecent();
   renderSummary();
@@ -394,43 +381,15 @@ let SUPA = {
 };
 let supa = null;
 function ensureSupa(){ if(!SUPA.url || !SUPA.anon) return null; try{ if(!supa){ supa = window.supabase.createClient(SUPA.url, SUPA.anon); } return supa; }catch(e){ console.error('Supabase no disponible', e); return null; } }
-async function getSession(){ const c = ensureSupa(); if(!c) return null; const { data } = await c.auth.getSession(); return data?.session || null; }
 async function getCurrentUser(){ const c = ensureSupa(); if(!c) return null; const { data } = await c.auth.getUser(); return data?.user || null; }
-async function signInWithEmail(email){
-  const c = ensureSupa(); if(!c) throw new Error('Configura SUPABASE_URL y ANON_KEY');
-  const redirect = location.origin + location.pathname;
-  const { error } = await c.auth.signInWithOtp({ email, options: { emailRedirectTo: redirect } });
-  if(error) throw error;
-}
+async function signInWithEmail(email){ const c = ensureSupa(); if(!c) throw new Error('Configura SUPABASE_URL y ANON_KEY'); const redirect = location.origin + location.pathname; const { error } = await c.auth.signInWithOtp({ email, options: { emailRedirectTo: redirect } }); if(error) throw error; }
 async function signOut(){ const c = ensureSupa(); if(!c) return; await c.auth.signOut(); }
-async function upsertProfileUsername(username){
-  const c = ensureSupa(); if(!c) throw new Error('Configura Supabase');
-  const user = await getCurrentUser(); if(!user) throw new Error('Inicia sesión');
-  const { error } = await c.from('profiles').upsert({ id: user.id, username }).select();
-  if(error) throw error;
-}
-function myShareItemsUsers(){
-  const rows = computeAggregatedByRestaurantCity(state.visits);
-  return rows.map(r => ({ restaurant: r.restaurant, city: r.city || '', avgPP: Number(fmt2(r.avgPP)), avgRating: Number(fmt2(r.avgRating)), visits: r.visits, mapsUrl: r.mapsUrl || '' }));
-}
-async function publishMySummary(){
-  const c = ensureSupa(); if(!c) throw new Error('Configura Supabase');
-  const user = await getCurrentUser(); if(!user) throw new Error('Inicia sesión');
-  const items = myShareItemsUsers();
-  const { error } = await c.from('summaries').upsert({ owner_id: user.id, items }).select();
-  if(error) throw error;
-}
-
+async function upsertProfileUsername(username){ const c = ensureSupa(); if(!c) throw new Error('Configura Supabase'); const user = await getCurrentUser(); if(!user) throw new Error('Inicia sesión'); const { error } = await c.from('profiles').upsert({ id: user.id, username }).select(); if(error) throw error; }
+function myShareItemsUsers(){ const rows = computeAggregatedByRestaurantCity(state.visits); return rows.map(r => ({ restaurant: r.restaurant, city: r.city || '', avgPP: Number(fmt2(r.avgPP)), avgRating: Number(fmt2(r.avgRating)), visits: r.visits, mapsUrl: r.mapsUrl || '' })); }
+async function publishMySummary(){ const c = ensureSupa(); if(!c) throw new Error('Configura Supabase'); const user = await getCurrentUser(); if(!user) throw new Error('Inicia sesión'); const items = myShareItemsUsers(); const { error } = await c.from('summaries').upsert({ owner_id: user.id, items }).select(); if(error) throw error; }
 let autoPublishTimer = null;
-function scheduleAutoPublish(){
-  if(autoPublishTimer) clearTimeout(autoPublishTimer);
-  autoPublishTimer = setTimeout(async () => {
-    try{ const c = ensureSupa(); if(!c) return; const user = await getCurrentUser(); if(!user) return; await publishMySummary(); }
-    catch(e){ console.warn('No se pudo auto-publicar:', e); }
-  }, 2000);
-}
+function scheduleAutoPublish(){ if(autoPublishTimer) clearTimeout(autoPublishTimer); autoPublishTimer = setTimeout(async () => { try{ const c = ensureSupa(); if(!c) return; const user = await getCurrentUser(); if(!user) return; await publishMySummary(); } catch(e){ console.warn('No se pudo auto-publicar:', e); } }, 2000); }
 
-// UI Cuenta / Config avanzada
 async function updateAccountInfo(){
   const info = byId('accountInfo');
   if(!SUPA.url || !SUPA.anon){ info.innerHTML = 'Supabase <strong>no configurado</strong>.'; return; }
