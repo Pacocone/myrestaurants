@@ -1,4 +1,23 @@
-// Simplified rebuild of the app logic focused on Supabase config + auth + publishing
+// Simplified rebuild ...
+// star rating handling
+const ratingWrap = byId('rating');
+function paintStars(v){
+  ratingWrap?.querySelectorAll('button[data-value]').forEach(btn=>{
+    const val = parseInt(btn.dataset.value,10);
+    btn.classList.toggle('filled', val<=v);
+  });
+}
+ratingWrap?.querySelectorAll('button[data-value]').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    byId('ratingValue').value = btn.dataset.value;
+    paintStars(parseInt(btn.dataset.value,10));
+  });
+});
+byId('ratingClear')?.addEventListener('click', ()=>{
+  byId('ratingValue').value = '0';
+  paintStars(0);
+});
+
 const $=s=>document.querySelector(s);const byId=id=>document.getElementById(id);
 let state={visits:[]};const DB_KEY='visitas_restaurantes_v1';function load(){try{state.visits=JSON.parse(localStorage.getItem(DB_KEY)||'[]')}catch(e){state.visits=[]}}function save(){localStorage.setItem(DB_KEY,JSON.stringify(state.visits));try{scheduleAutoPublish()}catch(e){}}
 function uid(){return Math.random().toString(36).slice(2)+Date.now().toString(36)}
@@ -49,7 +68,27 @@ function initTheme(){
 }
 
 
-function initForm(){byId('date').value=todayISO();byId('visitForm')?.addEventListener('submit',e=>{e.preventDefault();const v={id:uid(),restaurant:byId('restaurant').value,date:byId('date').value,diners:parseInt(byId('diners').value,10)||1,total:parseFloat(byId('total').value)||0,rating:parseInt(byId('ratingValue').value,10)||0,city:byId('city').value||'',notes:byId('notes').value||'',avg:0,mapsUrl:byId('mapsUrl').value||''};v.avg=v.diners?v.total/v.diners:0;state.visits.unshift(v);save();alert('Visita guardada');});}
+function initForm(){
+const mapsBtn = byId('mapsSearch');
+mapsBtn?.addEventListener('click', ()=>{
+  const name = byId('restaurant').value.trim();
+  if(!name){alert('Introduce el nombre del restaurante');return;}
+  const q = encodeURIComponent(name);
+  window.open('https://www.google.com/maps/search/?api=1&query='+q, '_blank');
+});
+
+  const dinersEl = byId('diners');
+  const totalEl = byId('total');
+  const avgEl   = byId('avgPerDiner');
+  function updateAvg(){
+    const diners = parseInt(dinersEl.value||'0',10);
+    const total  = parseFloat(totalEl.value||'0');
+    avgEl.value = diners>0 ? (Math.round((total/diners)*100)/100).toFixed(2)+' €' : '—';
+  }
+  dinersEl?.addEventListener('input', updateAvg);
+  totalEl ?.addEventListener('input', updateAvg);
+  updateAvg();
+byId('date').value=todayISO();byId('visitForm')?.addEventListener('submit',e=>{e.preventDefault();const v={id:uid(),restaurant:byId('restaurant').value,date:byId('date').value,diners:parseInt(byId('diners').value,10)||1,total:parseFloat(byId('total').value)||0,rating:parseInt(byId('ratingValue').value,10)||0,city:byId('city').value||'',notes:byId('notes').value||'',avg:0,mapsUrl:byId('mapsUrl').value||''};v.avg=v.diners?v.total/v.diners:0;state.visits.unshift(v);save();alert('Visita guardada');});}
 
 let SUPA={url: localStorage.getItem('rt_supabase_url') || (window.APP_CONFIG&&window.APP_CONFIG.SUPABASE_URL) || '', anon: localStorage.getItem('rt_supabase_anon') || (window.APP_CONFIG&&window.APP_CONFIG.SUPABASE_ANON_KEY) || ''};
 let supa=null;function ensureSupa(){if(!SUPA.url||!SUPA.anon) return null; if(!supa){supa=window.supabase.createClient(SUPA.url,SUPA.anon);} return supa;}
