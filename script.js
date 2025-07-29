@@ -10,7 +10,11 @@ const yearOf = iso => new Date(iso + 'T12:00:00').getFullYear();
 function norm(s){ return (s || '').toString().trim().replace(/\s+/g,' ').toLocaleLowerCase('es-ES'); }
 function avg(arr){ return arr.length ? arr.reduce((a,b)=>a+b,0) / arr.length : 0; }
 function uid(){ return Math.random().toString(36).slice(2) + Date.now().toString(36); }
-function escapeHTML(str){ return (str||'').replace(/[&<>"']/g, function(s){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[s]); }); }[s]); }); }[s])); }[s]); }
+function escapeHTML(str) {
+  return (str ?? '').toString().replace(/[&<>"']/g, (s) =>
+    ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[s])
+  );
+}
 
 // ====== Tema claro/oscuro ======
 function updateMetaThemeColor(){
